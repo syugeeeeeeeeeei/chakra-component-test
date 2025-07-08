@@ -92,7 +92,7 @@ export function Root({ children, defaultItems = [], styles: styleProps = {} }: R
 			if (isHoveringRef.current && !isToggleButtonHoveredRef.current) {
 				setIsOpen(true);
 			}
-		}, 250);
+		}, 200);
 	}, [clearOpenTimer]);
 
 	const handlePanelMouseLeave = useCallback(() => {

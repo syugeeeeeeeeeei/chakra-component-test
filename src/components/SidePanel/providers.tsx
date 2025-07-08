@@ -20,9 +20,15 @@ interface SelectionProviderProps {
 	children: ReactNode;
 	defaultActiveIds?: string[];
 	items: SidePanelItem[];
+	defaultMode?: SelectionMode;
 }
 
-export function SelectionProvider({ children, defaultActiveIds = [], items }: SelectionProviderProps) {
+export function SelectionProvider({
+	children,
+	defaultActiveIds = [],
+	items,
+	defaultMode = 'multiple',
+}: SelectionProviderProps) {
 	const [activeItemIds, setActiveItemIds] = useState<string[]>(defaultActiveIds);
 
 	const handleSelectItem = useCallback(
@@ -45,8 +51,8 @@ export function SelectionProvider({ children, defaultActiveIds = [], items }: Se
 	);
 
 	const value = useMemo(
-		() => ({ activeItemIds, handleSelectItem }),
-		[activeItemIds, handleSelectItem]
+		() => ({ activeItemIds, handleSelectItem, defaultMode }),
+		[activeItemIds, handleSelectItem, defaultMode]
 	);
 
 	return <SelectionContext.Provider value={value}>{children}</SelectionContext.Provider>;
@@ -57,7 +63,7 @@ export function SelectionProvider({ children, defaultActiveIds = [], items }: Se
 // =================================================================
 
 interface DeletableProviderProps {
-	children: ReactNode; // Render Propパターンをやめ、通常のchildrenを受け取る
+	children: ReactNode;
 	onDeleteItem: (itemId: string) => void;
 	dialogTitle?: string;
 	dialogBody?: string;
@@ -107,7 +113,6 @@ export function DeletableProvider({
 	return (
 		<DeletableContext.Provider value={value}>
 			{children}
-			{/* AlertDialogをProvider内部にカプセル化 */}
 			<AlertDialog isOpen={isOpen} onClose={onClose} leastDestructiveRef={cancelRef} isCentered>
 				<AlertDialogOverlay>
 					<AlertDialogContent>

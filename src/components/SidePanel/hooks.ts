@@ -1,9 +1,10 @@
 import { useContext } from 'react';
-import type { DeletableContextProps, ItemContextProps, RootContextProps, SelectionContextProps } from './contexts';
+import type { DeletableContextProps, ItemContextProps, RootContextProps, SectionContextProps, SelectionContextProps } from './contexts';
 import {
 	DeletableContext,
 	ItemContext,
 	RootContext,
+	SectionContext,
 	SelectionContext,
 } from './contexts';
 
@@ -22,8 +23,9 @@ function useRequiredContext<T>(context: React.Context<T | null>, contextName: st
 }
 
 // Core Hooks
-export const useRoot = (): RootContextProps => useRequiredContext(RootContext, 'SidePanel.Root');
+export const useRoot = (): RootContextProps => useRequiredContext(RootContext, 'SidePanel');
 export const useItem = (): ItemContextProps => useRequiredContext(ItemContext, 'SidePanel.Item');
+export const useSection = (): SectionContextProps => useContext(SectionContext);
 
 // Feature Plugin Hooks
 export const useSelection = (): SelectionContextProps | null => useContext(SelectionContext);

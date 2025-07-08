@@ -1,7 +1,8 @@
 import { VStack, type BoxProps } from '@chakra-ui/react';
-import { type ReactNode } from 'react';
-import { useRoot, useSelection } from './hooks.js';
-import type { SelectionMode } from './types.js';
+import { useMemo, type ReactNode } from 'react';
+import { SectionContext } from './contexts';
+import { useRoot, useSelection } from './hooks';
+import type { SelectionMode } from './types';
 
 // =================================================================
 // List Section
@@ -16,19 +17,20 @@ interface SectionProps extends BoxProps {
 export function Section({ children, selectionMode, selectionEnabled = true, ...props }: SectionProps) {
 	const selection = useSelection();
 
-	// Providerがないのにselection関連のpropが指定されたらエラーを投げる
-	if ((selectionMode || selectionEnabled === false) && !selection) {
+	if ((selectionMode !== undefined || !selectionEnabled) && !selection) {
 		throw new Error(
 			'selectionMode or selectionEnabled props cannot be used without a <SelectionProvider>.'
 		);
 	}
 
-	// このコンポーネントは現在、主にエラーチェックと将来の拡張性のために存在します。
-	// Contextを使ってセクションごとの状態を配下に渡すことも可能です。
+	const contextValue = useMemo(() => ({ selectionMode }), [selectionMode]);
+
 	return (
-		<VStack align="stretch" w="100%" spacing={2} {...props}>
-			{children}
-		</VStack>
+		<SectionContext.Provider value={contextValue}>
+			<VStack align="stretch" w="100%" spacing={2} {...props}>
+				{children}
+			</VStack>
+		</SectionContext.Provider>
 	);
 }
 
@@ -48,7 +50,7 @@ export function List({ children }: ListProps) {
 	}
 
 	return (
-		<VStack as="section" flex="1" w={"100%"} overflowY="auto" pr={2} overflowX="hidden" align="stretch" spacing={4}>
+		<VStack as="section" flex="1" overflowY="auto" pr={2} overflowX="hidden" align="stretch" spacing={4}>
 			{children}
 		</VStack>
 	);

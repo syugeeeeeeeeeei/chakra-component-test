@@ -1,7 +1,7 @@
 import { useMemo, type ReactNode } from 'react';
-import { ItemContext } from './contexts.js';
-import { useDeletable, useSelection } from './hooks.js';
-import type { SidePanelItem } from './types.js';
+import { ItemContext } from './contexts';
+import { useDeletable, useSection, useSelection } from './hooks';
+import type { SidePanelItem } from './types';
 
 interface ItemProps {
 	item: SidePanelItem;
@@ -15,8 +15,11 @@ interface ItemProps {
 export function Item({ item, children }: ItemProps) {
 	const selection = useSelection();
 	const deletable = useDeletable();
+	const section = useSection();
 
 	const isSelected = selection?.activeItemIds.includes(item.id) ?? false;
+
+	const effectiveSelectionMode = section.selectionMode || selection?.defaultMode || 'multiple';
 
 	const value = useMemo(() => {
 		return {
@@ -28,7 +31,7 @@ export function Item({ item, children }: ItemProps) {
 				containerProps: {},
 				triggerProps: {
 					onClick: selection
-						? () => selection.handleSelectItem(item.id, item.category, 'multiple') // モードはSectionから取得するよう拡張が必要
+						? () => selection.handleSelectItem(item.id, item.category, effectiveSelectionMode)
 						: undefined,
 					'aria-pressed': isSelected,
 				},
@@ -40,7 +43,7 @@ export function Item({ item, children }: ItemProps) {
 					: undefined,
 			},
 		};
-	}, [item, isSelected, selection, deletable]);
+	}, [item, isSelected, selection, deletable, effectiveSelectionMode]);
 
 	return <ItemContext.Provider value={value}>{children}</ItemContext.Provider>;
 }
