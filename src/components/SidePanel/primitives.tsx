@@ -4,7 +4,7 @@ import { type ReactNode } from 'react';
 import { FaTrash } from 'react-icons/fa';
 import { useItem, useRoot } from './hooks';
 
-const MotionButton = motion.create(Button);
+const MotionButton = motion(Button);
 
 // =================================================================
 // Trigger
@@ -26,6 +26,7 @@ export function Trigger({ children }: TriggerProps) {
 			flex="1"
 			justifyContent="flex-start"
 			size="sm"
+			minWidth={0} // ★修正点: flexアイテムがコンテンツ幅以下に縮小できるようにする
 			whileHover={{ scale: 1.02 }}
 			whileTap={{ scale: 0.98 }}
 			_hover={{
