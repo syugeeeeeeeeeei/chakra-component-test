@@ -1,149 +1,220 @@
-import { Box, Heading, HStack, Select, Text, VStack } from '@chakra-ui/react';
-import { useCallback } from 'react';
-import { SidePanel } from './components/SidePanel';
-import { useSidePanel } from './components/SidePanel/hooks';
-import type { SidePanelItem } from './components/SidePanel/types';
+import {
+	Accordion,
+	AccordionButton,
+	AccordionIcon,
+	AccordionItem,
+	AccordionPanel,
+	Box,
+	ChakraProvider,
+	Divider,
+	FormControl,
+	FormLabel,
+	Heading,
+	HStack,
+	Radio,
+	RadioGroup,
+	Stack,
+	Switch,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
+import { useMemo, useState } from 'react';
+import {
+	DeletableProvider,
+	SelectionProvider,
+	SidePanel,
+	type SelectionMode,
+	type SidePanelItem,
+} from './components/SidePanel'; // パスは実際の環境に合わせてください
 
-// --- Demo Data ---
-
-type Category = 'tech' | 'project';
-
-interface MyItem extends SidePanelItem {
-	category: Category;
-}
-
-const defaultItems: MyItem[] = [
-	{ id: 'tech-1', title: 'React', category: 'tech' },
-	{ id: 'tech-2', title: 'TypeScript', category: 'tech' },
-	{ id: 'tech-3', title: 'Chakra UI', category: 'tech' },
-	{ id: 'project-1', title: 'SidePanel開発', category: 'project' },
-	{ id: 'project-2', title: 'UI改善タスク', category: 'project' },
+// --- 初期データ ---
+const initialItems: SidePanelItem[] = [
+	{ id: 'proj-1', title: '次世代UIフレームワーク開発', category: 'project' },
+	{ id: 'proj-2', title: 'AI搭載型コードレビューツール', category: 'project' },
+	{ id: 'task-1', title: 'UIデザインシステムの構築', category: 'task' },
+	{ id: 'task-2', title: 'APIスキーマの定義と実装', category: 'task' },
+	{ id: 'task-3', title: 'E2Eテスト環境のセットアップ', category: 'task' },
+	{ id: 'report-1', title: '2025年上期技術レポート', category: 'report' },
 ];
 
-/**
- * SidePanelの内部コンテンツをレンダリングするコンポーネント
- * useSidePanelフックはこのコンポーネント内で呼び出す
- */
-const PanelContent = () => {
-	const { filteredItems, handleCreateItem } = useSidePanel();
+// --- アイテムのUIコンポーネント ---
 
-	const allItems = filteredItems as MyItem[];
-	const techItems = allItems.filter(item => item.category === 'tech');
-	const projectItems = allItems.filter(item => item.category === 'project');
+// 標準的なボタン形式のアイテム
+const ButtonItem = () => (
+	<HStack w="100%">
+		<SidePanel.List.Item.Trigger>
+			<SidePanel.List.Item.Text />
+		</SidePanel.List.Item.Trigger>
+		<SidePanel.List.Item.DeleteButton />
+	</HStack>
+);
 
-	const handleCreateProject = useCallback(() => {
-		handleCreateItem<Category>({
-			title: '新規プロジェクト',
-			category: 'project',
-		});
-	}, [handleCreateItem]);
+// アコーディオン形式のアイテム
+const AccordionItemComponent = () => (
+	<Accordion allowToggle w="100%">
+		<AccordionItem border="none">
+			<AccordionButton as="div" w="100%" p={0} _hover={{ bg: 'transparent' }}>
+				<SidePanel.List.Item.Trigger>
+					<HStack w="100%" justifyContent="space-between">
+						<SidePanel.List.Item.Text />
+						<AccordionIcon />
+					</HStack>
+				</SidePanel.List.Item.Trigger>
+			</AccordionButton>
+			<AccordionPanel pb={4}>
+				<Text fontSize="sm">ここにアイテムの詳細情報を表示できます。</Text>
+				<SidePanel.List.Item.DeleteButton />
+			</AccordionPanel>
+		</AccordionItem>
+	</Accordion>
+);
 
-	const handleCreateTech = useCallback(() => {
-		handleCreateItem<Category>({
-			title: '新規技術スタック',
-			category: 'tech'
-		})
-	}, [handleCreateItem])
+// --- メインのデモページコンポーネント ---
+
+function SidePanelDemoPage() {
+	// --- State管理 ---
+	const [items, setItems] = useState(initialItems);
+	const [isSelectionEnabled, setSelectionEnabled] = useState(true);
+	const [isDeletableEnabled, setDeletableEnabled] = useState(true);
+	const [projectSectionMode, setProjectSectionMode] = useState<SelectionMode>('single');
+	const [taskSectionMode, setTaskSectionMode] = useState<SelectionMode>('multiple');
+	const [itemComponentType, setItemComponentType] = useState<'button' | 'accordion'>('button');
+
+	// --- データとハンドラ ---
+	const projectItems = useMemo(() => items.filter((item) => item.category === 'project'), [items]);
+	const taskItems = useMemo(() => items.filter((item) => item.category === 'task'), [items]);
+	const reportItems = useMemo(() => items.filter((item) => item.category === 'report'), [items]);
+
+	const handleDelete = (itemId: string) => {
+		setItems((prev) => prev.filter((item) => item.id !== itemId));
+	};
+
+	// --- UIコンポーネントの選択 ---
+	const ItemComponent = itemComponentType === 'button' ? ButtonItem : AccordionItemComponent;
+
+	// --- Providerを条件に応じてラップする ---
+	const SidePanelWithProviders = (
+		<SidePanel defaultItems={items} styles={{ panelBgColor: 'gray.50' }}>
+			<SidePanel.Header />
+			<SidePanel.List>
+				{/* プロジェクトセクション */}
+				<SidePanel.List.Section selectionMode={projectSectionMode}>
+					<Heading size="sm" color="gray.600" mb={2}>プロジェクト</Heading>
+					{projectItems.map((item) => (
+						<SidePanel.List.Item key={item.id} item={item}>
+							<ItemComponent />
+						</SidePanel.List.Item>
+					))}
+				</SidePanel.List.Section>
+
+				{/* タスクセクション */}
+				<SidePanel.List.Section selectionMode={taskSectionMode}>
+					<Heading size="sm" color="gray.600" mb={2}>タスク</Heading>
+					{taskItems.map((item) => (
+						<SidePanel.List.Item key={item.id} item={item}>
+							<ItemComponent />
+						</SidePanel.List.Item>
+					))}
+				</SidePanel.List.Section>
+
+				{/* レポートセクション (選択無効) */}
+				<SidePanel.List.Section selectionEnabled={false}>
+					<Heading size="sm" color="gray.600" mb={2}>レポート (選択不可)</Heading>
+					{reportItems.map((item) => (
+						<SidePanel.List.Item key={item.id} item={item}>
+							<ItemComponent />
+						</SidePanel.List.Item>
+					))}
+				</SidePanel.List.Section>
+			</SidePanel.List>
+		</SidePanel>
+	);
+
+	let finalComponent = SidePanelWithProviders;
+	if (isDeletableEnabled) {
+		finalComponent = <DeletableProvider onDeleteItem={handleDelete}>{finalComponent}</DeletableProvider>;
+	}
+	if (isSelectionEnabled) {
+		finalComponent = <SelectionProvider items={items}>{finalComponent}</SelectionProvider>;
+	}
 
 	return (
-		<SidePanel.List>
-			{/* "技術スタック" セクション (複数選択、削除不可) */}
-			<SidePanel.List.Section selectionMode="multiple" isDeletable={false}>
-				<SidePanel.List.Header onCreate={handleCreateTech}>
-					技術スタック (削除不可)
-				</SidePanel.List.Header>
-				<SidePanel.List.Content>
-					{techItems.map((item) => (
-						<SidePanel.List.Item key={item.id} item={item} />
-					))}
-				</SidePanel.List.Content>
-			</SidePanel.List.Section>
+		<Box display="flex" h="100vh" w="100vw">
+			{finalComponent}
+			<Box as="main" flex="1" p={8} overflowY="auto">
+				<VStack spacing={8} align="flex-start">
+					<Heading size="lg">SidePanel カスタマイズデモ</Heading>
+					<Text>右側のコントロールを操作して、左側のサイドパネルの挙動を切り替えることができます。</Text>
 
-			{/* "プロジェクト" セクション (単一選択、削除可能) */}
-			<SidePanel.List.Section selectionMode="single">
-				<SidePanel.List.Header onCreate={handleCreateProject}>
-					プロジェクト (削除可能)
-				</SidePanel.List.Header>
-				<SidePanel.List.Content>
-					{/* {projectItems.map((item) => (
-						<SidePanel.List.Item key={item.id} item={item} />
-					))} */}
-					<Select placeholder='Select option'>
-						<option value='option1'>Option 1</option>
-						<option value='option2'>Option 2</option>
-						<option value='option3'>Option 3</option>
-					</Select>
-				</SidePanel.List.Content>
-			</SidePanel.List.Section>
-		</SidePanel.List>
+					<Divider />
+
+					{/* --- コントロールパネル --- */}
+					<VStack spacing={6} align="flex-start" w="100%">
+						<Heading size="md">機能の有効化</Heading>
+						<FormControl display="flex" alignItems="center">
+							<FormLabel htmlFor="selection-switch" mb="0">
+								選択機能 (`SelectionProvider`)
+							</FormLabel>
+							<Switch id="selection-switch" isChecked={isSelectionEnabled} onChange={(e) => setSelectionEnabled(e.target.checked)} />
+						</FormControl>
+						<FormControl display="flex" alignItems="center">
+							<FormLabel htmlFor="deletable-switch" mb="0">
+								削除機能 (`DeletableProvider`)
+							</FormLabel>
+							<Switch id="deletable-switch" isChecked={isDeletableEnabled} onChange={(e) => setDeletableEnabled(e.target.checked)} />
+						</FormControl>
+					</VStack>
+
+					<Divider />
+
+					<VStack spacing={6} align="flex-start" w="100%">
+						<Heading size="md">セクションごとの設定</Heading>
+						<FormControl>
+							<FormLabel>プロジェクトセクションの選択モード</FormLabel>
+							<RadioGroup onChange={(v) => setProjectSectionMode(v as SelectionMode)} value={projectSectionMode}>
+								<Stack direction="row">
+									<Radio value="single">単一選択 (single)</Radio>
+									<Radio value="multiple">複数選択 (multiple)</Radio>
+								</Stack>
+							</RadioGroup>
+						</FormControl>
+						<FormControl>
+							<FormLabel>タスクセクションの選択モード</FormLabel>
+							<RadioGroup onChange={(v) => setTaskSectionMode(v as SelectionMode)} value={taskSectionMode}>
+								<Stack direction="row">
+									<Radio value="single">単一選択 (single)</Radio>
+									<Radio value="multiple">複数選択 (multiple)</Radio>
+								</Stack>
+							</RadioGroup>
+						</FormControl>
+					</VStack>
+
+					<Divider />
+
+					<VStack spacing={6} align="flex-start" w="100%">
+						<Heading size="md">アイテムUIの切り替え</Heading>
+						<FormControl>
+							<FormLabel>コンポーネントタイプ</FormLabel>
+							<RadioGroup onChange={(v) => setItemComponentType(v as 'button' | 'accordion')} value={itemComponentType}>
+								<Stack direction="row">
+									<Radio value="button">ボタン形式</Radio>
+									<Radio value="accordion">アコーディオン形式</Radio>
+								</Stack>
+							</RadioGroup>
+						</FormControl>
+					</VStack>
+				</VStack>
+			</Box>
+		</Box>
 	);
 }
 
-
-/**
- * デモページ全体のレイアウトを定義するメインコンポーネント
- */
-const SidePanelLayout = () => {
+function App() {
 	return (
-		<HStack spacing={0} w="100%" h="100vh" bg="gray.50">
-			<SidePanel
-				selectionMode="multiple"
-				defaultItems={defaultItems}
-				defaultActiveItemIds={['tech-1', 'project-1']}
-			>
-				<SidePanel.Header />
-				<SidePanel.CreateButton
-					createButtonText="プロジェクト作成"
-					defaultItem={{
-						title: '新規プロジェクト',
-						category: 'project'
-					}}
-				/>
-				{/* SidePanelの子要素としてPanelContentを配置 */}
-				<PanelContent />
-			</SidePanel>
-
-			{/* 右側の説明パネル */}
-			<VStack flex="1" p={8} align="flex-start" spacing={8}>
-				<Heading as="h1" size="xl">SidePanel Demo</Heading>
-
-				<Box>
-					<Heading as="h2" size="md" mb={3}>セクションごとの選択モード</Heading>
-					<Text>
-						セクションごとに異なる選択モードが設定されています。
-					</Text>
-					<VStack align="stretch" mt={4} spacing={3}>
-						<Box p={4} borderWidth="1px" borderRadius="md" bg="white">
-							<Heading size="sm">技術スタック</Heading>
-							<Text mt={1}>このセクションは <strong>複数選択 (multiple)</strong> モードです。</Text>
-						</Box>
-						<Box p={4} borderWidth="1px" borderRadius="md" bg="white">
-							<Heading size="sm">プロジェクト</Heading>
-							<Text mt={1}>このセクションは <strong>単一選択 (single)</strong> モードです。</Text>
-						</Box>
-					</VStack>
-				</Box>
-
-				<Box>
-					<Heading as="h2" size="md" mb={3}>アイテムの削除制御</Heading>
-					<Text>
-						<code>isDeletable</code> prop を使うことで、セクションごとにアイテムの削除可否を制御できます。
-					</Text>
-					<VStack align="stretch" mt={4} spacing={3}>
-						<Box p={4} borderWidth="1px" borderRadius="md" bg="white">
-							<Heading size="sm">技術スタック</Heading>
-							<Text mt={1}>このセクションは <strong>削除不可 (isDeletable=false)</strong> に設定されており、削除ボタンは表示されません。</Text>
-						</Box>
-						<Box p={4} borderWidth="1px" borderRadius="md" bg="white">
-							<Heading size="sm">プロジェクト</Heading>
-							<Text mt={1}>こちらは <strong>削除可能 (デフォルト)</strong> です。アイテムにマウスカーソルを合わせるとゴミ箱アイコンが表示されます。</Text>
-						</Box>
-					</VStack>
-				</Box>
-
-			</VStack>
-		</HStack>
+		<ChakraProvider>
+			<SidePanelDemoPage />
+		</ChakraProvider>
 	);
-};
+}
 
-export default SidePanelLayout;
+export default App;
