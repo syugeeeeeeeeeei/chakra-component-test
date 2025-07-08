@@ -1,9 +1,9 @@
-import { Header as HeaderComponent } from './Header.js';
-import { Item as ItemComponent } from './Item.js';
-import { List as ListComponent, Section as SectionComponent } from './List.js';
+import { Header as HeaderComponent } from './Header';
+import { Item as ItemComponent } from './Item';
+import { List as ListComponent, Header as ListHeaderComponent, Section as SectionComponent } from './List';
 import { DeleteButton, ItemText, Trigger } from './primitives';
-import { Root as RootComponent } from './Root.js';
-import type { ChakraColor, SelectionMode, SidePanelItem, SidePanelStyleProps } from './types.js';
+import { Root as RootComponent } from './Root';
+import type { ChakraColor, SelectionMode, SidePanelItem, SidePanelStyleProps } from './types';
 
 // 型定義のエクスポート
 export type { ChakraColor, SelectionMode, SidePanelItem, SidePanelStyleProps };
@@ -23,6 +23,7 @@ const Item = Object.assign(ItemComponent, {
 
 const List = Object.assign(ListComponent, {
 	Section: SectionComponent,
+	Header: ListHeaderComponent, // HeadingからHeaderに変更
 	Item: Item,
 });
 

@@ -1,8 +1,25 @@
-import { VStack, type BoxProps } from '@chakra-ui/react';
+import { Heading as ChakraHeading, VStack, type BoxProps, type HeadingProps as ChakraHeadingProps } from '@chakra-ui/react';
 import { useMemo, type ReactNode } from 'react';
 import { SectionContext } from './contexts';
 import { useRoot, useSelection } from './hooks';
 import type { SelectionMode } from './types';
+
+// =================================================================
+// List Header (旧Heading)
+// =================================================================
+
+interface HeaderProps extends ChakraHeadingProps {
+	children: ReactNode;
+}
+
+export function Header({ children, ...props }: HeaderProps) {
+	return (
+		<ChakraHeading size="sm" color="gray.600" mb={2} noOfLines={1} {...props}>
+			{children}
+		</ChakraHeading>
+	);
+}
+
 
 // =================================================================
 // List Section

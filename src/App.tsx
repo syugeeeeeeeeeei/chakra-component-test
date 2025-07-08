@@ -39,7 +39,6 @@ const initialItems: SidePanelItem[] = [
 
 // --- アイテムのUIコンポーネント ---
 
-// 標準的なボタン形式のアイテム
 const ButtonItem = () => (
   <HStack w="100%">
     <SidePanel.List.Item.Trigger>
@@ -49,7 +48,6 @@ const ButtonItem = () => (
   </HStack>
 );
 
-// アコーディオン形式のアイテム
 const AccordionItemComponent = () => (
   <Accordion allowToggle w="100%">
     <AccordionItem border="none">
@@ -99,7 +97,7 @@ function SidePanelDemoPage() {
       <SidePanel.List>
         {/* プロジェクトセクション */}
         <SidePanel.List.Section {...(isSelectionEnabled ? { selectionMode: projectSectionMode } : {})}>
-          <Heading size="sm" color="gray.600" mb={2}>プロジェクト</Heading>
+          <SidePanel.List.Header>プロジェクト</SidePanel.List.Header>
           {projectItems.map((item) => (
             <SidePanel.List.Item key={item.id} item={item}>
               <ItemComponent />
@@ -109,7 +107,7 @@ function SidePanelDemoPage() {
 
         {/* タスクセクション */}
         <SidePanel.List.Section {...(isSelectionEnabled ? { selectionMode: taskSectionMode } : {})}>
-          <Heading size="sm" color="gray.600" mb={2}>タスク</Heading>
+          <SidePanel.List.Header>タスク</SidePanel.List.Header>
           {taskItems.map((item) => (
             <SidePanel.List.Item key={item.id} item={item}>
               <ItemComponent />
@@ -119,7 +117,7 @@ function SidePanelDemoPage() {
 
         {/* レポートセクション (選択無効) */}
         <SidePanel.List.Section {...(isSelectionEnabled ? { selectionEnabled: false } : {})}>
-          <Heading size="sm" color="gray.600" mb={2}>レポート (選択不可)</Heading>
+          <SidePanel.List.Header>レポート (選択不可)</SidePanel.List.Header>
           {reportItems.map((item) => (
             <SidePanel.List.Item key={item.id} item={item}>
               <ItemComponent />
@@ -135,7 +133,8 @@ function SidePanelDemoPage() {
     finalComponent = <DeletableProvider onDeleteItem={handleDelete}>{finalComponent}</DeletableProvider>;
   }
   if (isSelectionEnabled) {
-    finalComponent = <SelectionProvider items={items}>{finalComponent}</SelectionProvider>;
+    // `defaultMode` は、セクションで指定されなかった場合のフォールバックとして機能します。
+    finalComponent = <SelectionProvider items={items} defaultMode="multiple">{finalComponent}</SelectionProvider>;
   }
 
   return (
@@ -148,7 +147,6 @@ function SidePanelDemoPage() {
 
           <Divider />
 
-          {/* --- コントロールパネル --- */}
           <VStack spacing={6} align="flex-start" w="100%">
             <Heading size="md">機能の有効化</Heading>
             <FormControl display="flex" alignItems="center">
