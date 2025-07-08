@@ -15,9 +15,12 @@ interface ItemProps {
 export function Item({ item, children }: ItemProps) {
 	const selection = useSelection();
 	const deletable = useDeletable();
-	const section = useSection();
+	const section = useSection(); // SectionContextからselectionEnabledを取得するために追加
 
 	const isSelected = selection?.activeItemIds.includes(item.id) ?? false;
+
+	// セクションのselectionEnabledプロパティを考慮
+	const isSelectionEnabledInThisSection = section.selectionEnabled;
 
 	const effectiveSelectionMode = section.selectionMode || selection?.defaultMode || 'multiple';
 
@@ -30,10 +33,13 @@ export function Item({ item, children }: ItemProps) {
 			props: {
 				containerProps: {},
 				triggerProps: {
-					onClick: selection
-						? () => selection.handleSelectItem(item.id, item.category, effectiveSelectionMode)
-						: undefined,
+					// isSelectionEnabledInThisSection が true の場合のみ onClick を設定
+					onClick:
+						selection && isSelectionEnabledInThisSection
+							? () => selection.handleSelectItem(item.id, item.category, effectiveSelectionMode)
+							: undefined,
 					'aria-pressed': isSelected,
+					'data-selection-enabled': isSelectionEnabledInThisSection, // デバッグ用に属性を追加
 				},
 				deleteButtonProps: deletable
 					? {
@@ -43,7 +49,8 @@ export function Item({ item, children }: ItemProps) {
 					: undefined,
 			},
 		};
-	}, [item, isSelected, selection, deletable, effectiveSelectionMode]);
+	}, [item, isSelected, selection, deletable, effectiveSelectionMode, isSelectionEnabledInThisSection]); // 依存配列に追加
 
 	return <ItemContext.Provider value={value}>{children}</ItemContext.Provider>;
 }
+

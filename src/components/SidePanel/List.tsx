@@ -28,7 +28,7 @@ export function Header({ children, ...props }: HeaderProps) {
 interface SectionProps extends BoxProps {
 	children: ReactNode;
 	selectionMode?: SelectionMode;
-	selectionEnabled?: boolean;
+	selectionEnabled?: boolean; // selectionEnabled をオプションから必須に変更（ただしデフォルト値で対応）
 }
 
 export function Section({ children, selectionMode, selectionEnabled = true, ...props }: SectionProps) {
@@ -40,7 +40,8 @@ export function Section({ children, selectionMode, selectionEnabled = true, ...p
 		);
 	}
 
-	const contextValue = useMemo(() => ({ selectionMode }), [selectionMode]);
+	// contextValue に selectionEnabled を追加
+	const contextValue = useMemo(() => ({ selectionMode, selectionEnabled }), [selectionMode, selectionEnabled]);
 
 	return (
 		<SectionContext.Provider value={contextValue}>
@@ -72,3 +73,4 @@ export function List({ children }: ListProps) {
 		</VStack>
 	);
 }
+
