@@ -48,7 +48,7 @@ export function List({ children }: ListProps) {
 	}
 
 	return (
-		<VStack as="section" flex="1" overflowY="auto" pr={2} overflowX="hidden" align="stretch" spacing={4}>
+		<VStack as="section" flex="1" w={"100%"} overflowY="auto" pr={2} overflowX="hidden" align="stretch" spacing={4}>
 			{children}
 		</VStack>
 	);
