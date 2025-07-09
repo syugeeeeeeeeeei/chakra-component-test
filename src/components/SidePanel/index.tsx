@@ -21,14 +21,16 @@ const Item = Object.assign(ItemComponent, {
 	DeleteButton: DeleteButton,
 });
 
+// ★修正点: SectionにHeaderを組み込む
 const Section = Object.assign(SectionComponent, {
+	Header: ListHeaderComponent,
 	Empty: SectionEmpty,
 	Content: SectionContentComponent,
 });
 
+// ★修正点: ListからHeaderを削除
 const List = Object.assign(ListComponent, {
 	Section: Section,
-	Header: ListHeaderComponent,
 	Item: Item,
 	Empty: ListEmpty,
 });

@@ -47,17 +47,11 @@ function App() {
                   </SidePanel.List.Empty>
 
                   <SidePanel.List.Section category="project">
-                    <SidePanel.List.Header>プロジェクト</SidePanel.List.Header>
-                    <SidePanel.List.Section.Empty>
-                      <Center h="50px">
-                        <Text fontSize="sm" color="gray.400">
-                          プロジェクトはありません
-                        </Text>
-                      </Center>
-                    </SidePanel.List.Section.Empty>
+                    <SidePanel.List.Section.Header>プロジェクト</SidePanel.List.Section.Header>
+
                     {/* ★新しいAPI: Contentコンポーネントでアイテムの描画方法を定義 */}
                     <SidePanel.List.Section.Content>
-                      {(item: SidePanelItem) => (
+                      {(item) => (
                         <SidePanel.List.Item key={item.id} item={item}>
                           <HStack w="100%">
                             <SidePanel.List.Item.Trigger>
@@ -68,6 +62,13 @@ function App() {
                         </SidePanel.List.Item>
                       )}
                     </SidePanel.List.Section.Content>
+                    <SidePanel.List.Section.Empty>
+                      <Center h="50px">
+                        <Text fontSize="sm" color="gray.400">
+                          プロジェクトはありません
+                        </Text>
+                      </Center>
+                    </SidePanel.List.Section.Empty>
                   </SidePanel.List.Section>
 
                   <SidePanel.List.Section category="task">
