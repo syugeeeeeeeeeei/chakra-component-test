@@ -1,6 +1,7 @@
 import { Box, VStack } from '@chakra-ui/react';
 import React, { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
 import { RootContext } from './contexts';
+import { useSearch } from './hooks';
 import type { SidePanelItem, SidePanelStyleProps } from './types';
 
 interface PanelContainerProps {
@@ -39,19 +40,31 @@ PanelContainer.displayName = 'PanelContainer';
 
 interface RootProps {
 	children: ReactNode;
-	defaultItems?: SidePanelItem[];
+	items?: SidePanelItem[];
 	styles?: SidePanelStyleProps;
 }
 
-export function Root({ children, defaultItems = [], styles: styleProps = {} }: RootProps) {
+export function Root({ children, items = [], styles: styleProps = {} }: RootProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isClickOpen, setIsClickOpen] = useState(false);
-	const [items, setItems] = useState<SidePanelItem[]>(defaultItems);
+
+	const search = useSearch();
+
+	// 親から渡された`items`プロパティを直接利用してフィルタリング
+	const displayItems = useMemo(() => {
+		if (!search || !search.searchQuery) {
+			return items;
+		}
+		const query = search.searchQuery.toLowerCase();
+		return items.filter(item =>
+			item.title.toLowerCase().includes(query)
+		);
+	}, [items, search]);
 
 	const timerRef = useRef<number | null>(null);
 	const leaveTimerRef = useRef<number | null>(null);
 	const isHoveringRef = useRef<boolean>(false);
-	const isToggleButtonHoveredRef = useRef<boolean>(false); // ボタンホバー状態を管理
+	const isToggleButtonHoveredRef = useRef<boolean>(false);
 
 	const styles = useMemo<Required<SidePanelStyleProps>>(() => ({
 		panelBgColor: styleProps.panelBgColor ?? 'white',
@@ -88,7 +101,6 @@ export function Root({ children, defaultItems = [], styles: styleProps = {} }: R
 		if (leaveTimerRef.current !== null) clearTimeout(leaveTimerRef.current);
 		clearOpenTimer();
 		timerRef.current = window.setTimeout(() => {
-			// ボタンがホバーされていない場合のみパネルを開く
 			if (isHoveringRef.current && !isToggleButtonHoveredRef.current) {
 				setIsOpen(true);
 			}
@@ -112,12 +124,11 @@ export function Root({ children, defaultItems = [], styles: styleProps = {} }: R
 			handleOpenClick,
 			handlePanelMouseEnter,
 			handlePanelMouseLeave,
-			isToggleButtonHoveredRef, // Contextにrefを渡す
-			items,
-			setItems,
+			isToggleButtonHoveredRef,
+			items: displayItems,
 			styles
 		}),
-		[isOpen, isClickOpen, handleOpenClick, handlePanelMouseEnter, handlePanelMouseLeave, items, styles]
+		[isOpen, isClickOpen, handleOpenClick, handlePanelMouseEnter, handlePanelMouseLeave, displayItems, styles]
 	);
 
 	return (

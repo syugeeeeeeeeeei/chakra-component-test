@@ -1,4 +1,4 @@
-import { createContext, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
+import { createContext, type Dispatch, type RefObject, type SetStateAction } from 'react';
 import type { SelectionMode, SidePanelItem, SidePanelStyleProps } from './types';
 
 // =================================================================
@@ -10,9 +10,8 @@ export interface RootContextProps {
 	handleOpenClick: () => void;
 	handlePanelMouseEnter: () => void;
 	handlePanelMouseLeave: () => void;
-	isToggleButtonHoveredRef: MutableRefObject<boolean>;
+	isToggleButtonHoveredRef: RefObject<boolean>;
 	items: SidePanelItem[];
-	setItems: Dispatch<SetStateAction<SidePanelItem[]>>;
 	styles: Required<SidePanelStyleProps>;
 }
 export const RootContext = createContext<RootContextProps | null>(null);
@@ -35,6 +34,7 @@ export const ItemContext = createContext<ItemContextProps | null>(null);
 // Section Context
 // =================================================================
 export interface SectionContextProps {
+	selectionEnabled?: boolean;
 	selectionMode?: SelectionMode;
 }
 export const SectionContext = createContext<SectionContextProps>({});

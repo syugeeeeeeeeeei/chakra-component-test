@@ -4,7 +4,7 @@ import { type ReactNode } from 'react';
 import { FaTrash } from 'react-icons/fa';
 import { useItem, useRoot } from './hooks';
 
-const MotionButton = motion(Button);
+const MotionButton = motion.create(Button);
 
 // =================================================================
 // Trigger
