@@ -1,4 +1,4 @@
-import { createContext, type Dispatch, type RefObject, type SetStateAction } from 'react';
+import { createContext, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import type { SelectionMode, SidePanelItem, SidePanelStyleProps } from './types';
 
 // =================================================================
@@ -10,7 +10,7 @@ export interface RootContextProps {
 	handleOpenClick: () => void;
 	handlePanelMouseEnter: () => void;
 	handlePanelMouseLeave: () => void;
-	isToggleButtonHoveredRef: RefObject<boolean>;
+	isToggleButtonHoveredRef: MutableRefObject<boolean>;
 	items: SidePanelItem[];
 	setItems: Dispatch<SetStateAction<SidePanelItem[]>>;
 	styles: Required<SidePanelStyleProps>;
@@ -25,7 +25,7 @@ export interface ItemContextProps {
 	state: { isSelected: boolean };
 	props: {
 		containerProps: Record<string, unknown>;
-		triggerProps: { onClick?: () => void; 'aria-pressed': boolean; 'data-selection-enabled': boolean }; // data-selection-enabled を追加
+		triggerProps: { onClick?: () => void; 'aria-pressed': boolean };
 		deleteButtonProps?: { onClick: () => void; 'aria-label': string };
 	};
 }
@@ -36,9 +36,8 @@ export const ItemContext = createContext<ItemContextProps | null>(null);
 // =================================================================
 export interface SectionContextProps {
 	selectionMode?: SelectionMode;
-	selectionEnabled: boolean; // selectionEnabled を追加
 }
-export const SectionContext = createContext<SectionContextProps>({ selectionEnabled: true }); // デフォルト値を設定
+export const SectionContext = createContext<SectionContextProps>({});
 
 
 // =================================================================
@@ -47,7 +46,7 @@ export const SectionContext = createContext<SectionContextProps>({ selectionEnab
 export interface SelectionContextProps {
 	activeItemIds: string[];
 	handleSelectItem: (itemId: string, itemCategory: string | undefined, mode: SelectionMode) => void;
-	defaultMode: SelectionMode; // グローバルな選択モード
+	defaultMode: SelectionMode;
 }
 export const SelectionContext = createContext<SelectionContextProps | null>(null);
 
@@ -57,3 +56,10 @@ export interface DeletableContextProps {
 }
 export const DeletableContext = createContext<DeletableContextProps | null>(null);
 
+export interface SearchContextProps {
+	searchQuery: string;
+	onSearchQueryChange: (query: string) => void;
+	isSearchOpen: boolean;
+	setIsSearchOpen: Dispatch<SetStateAction<boolean>>;
+}
+export const SearchContext = createContext<SearchContextProps | null>(null);

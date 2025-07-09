@@ -9,7 +9,7 @@ import type { ChakraColor, SelectionMode, SidePanelItem, SidePanelStyleProps } f
 export type { ChakraColor, SelectionMode, SidePanelItem, SidePanelStyleProps };
 
 // 機能Providerのエクスポート
-	export { DeletableProvider, SelectionProvider } from './providers';
+	export { DeletableProvider, SearchProvider, SelectionProvider } from './providers';
 
 // =================================================================
 // コンポーネントの組み立て
@@ -23,12 +23,11 @@ const Item = Object.assign(ItemComponent, {
 
 const List = Object.assign(ListComponent, {
 	Section: SectionComponent,
-	Header: ListHeaderComponent, // HeadingからHeaderに変更
+	Header: ListHeaderComponent,
 	Item: Item,
 });
 
 export const SidePanel = Object.assign(RootComponent, {
 	Header: HeaderComponent,
 	List: List,
-	// Footerなどもここに追加可能
 });

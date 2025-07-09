@@ -9,7 +9,7 @@ import {
 	useDisclosure,
 } from '@chakra-ui/react';
 import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
-import { DeletableContext, SelectionContext } from './contexts';
+import { DeletableContext, SearchContext, SelectionContext } from './contexts';
 import type { SelectionMode, SidePanelItem } from './types';
 
 // =================================================================
@@ -131,4 +131,32 @@ export function DeletableProvider({
 			</AlertDialog>
 		</DeletableContext.Provider>
 	);
+}
+
+// =================================================================
+// Search Provider
+// =================================================================
+interface SearchProviderProps {
+	children: ReactNode;
+}
+
+export function SearchProvider({ children }: SearchProviderProps) {
+	const [searchQuery, setSearchQuery] = useState('');
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+	const onSearchQueryChange = useCallback((query: string) => {
+		setSearchQuery(query);
+	}, []);
+
+	const value = useMemo(
+		() => ({
+			searchQuery,
+			onSearchQueryChange,
+			isSearchOpen,
+			setIsSearchOpen,
+		}),
+		[searchQuery, onSearchQueryChange, isSearchOpen]
+	);
+
+	return <SearchContext.Provider value={value}>{children}</SearchContext.Provider>;
 }
