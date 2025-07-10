@@ -72,7 +72,7 @@ function App() {
                   </SidePanel.List.Section>
 
                   <SidePanel.List.Section category="task">
-                    <SidePanel.List.Header>タスク</SidePanel.List.Header>
+                    <SidePanel.List.Section.Header>タスク</SidePanel.List.Section.Header>
                     <SidePanel.List.Section.Empty>
                       <Center h="50px">
                         <Text fontSize="sm" color="gray.400">
@@ -95,7 +95,7 @@ function App() {
                   </SidePanel.List.Section>
 
                   <SidePanel.List.Section category="report" selectionEnabled={false}>
-                    <SidePanel.List.Header>レポート (選択不可)</SidePanel.List.Header>
+                    <SidePanel.List.Section.Header>レポート (選択不可)</SidePanel.List.Section.Header>
                     <SidePanel.List.Section.Content>
                       {(item: SidePanelItem) => (
                         <SidePanel.List.Item key={item.id} item={item}>
